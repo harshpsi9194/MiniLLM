@@ -25,6 +25,7 @@
 - `sciminilm/inference/`: `KVCache` with rollback, Top-K/Top-P sampling, `InferenceEngine`, and `SpeculativeDecoder`
 - `sciminilm/training/`: Byte-level BPE `ScientificTokenizer`, `PackedTokenStreamingDataset` & `MemmapTokenDataset` (500M token budget), and `Trainer`
 - `sciminilm/benchmarks/`: MHA vs GQA vs MQA comparison across context lengths on perplexity, KV-cache memory, and latency
+- `data/`: Multi-domain scientific-text corpus (`train.jsonl`, `val.jsonl`, `README.md`) fetched from arXiv & EuropePMC
 
 ## Running Tests & Scripts
 
@@ -34,6 +35,8 @@ pytest
 ```
 
 CLI tools in `scripts/`:
+- `python scripts/download_dataset.py --out-dir data`
+- `python scripts/train_500m.py --data-files data/train.jsonl --max-steps 50`
 - `python scripts/train_500m.py --dry-run`
 - `python scripts/bench_attention.py --preset tiny`
 - `python scripts/eval_quant.py --preset tiny`

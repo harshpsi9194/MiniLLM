@@ -129,3 +129,27 @@ def test_trainer_runs_and_checkpoints(tmp_path: Path):
     trainer2.load_checkpoint(ckpt_file)
     assert trainer2.global_step == 3
     assert trainer2.tokens_seen == 3 * 2 * 2 * 16
+
+
+def test_repo_scientific_dataset_loads():
+    repo_root = Path(__file__).resolve().parent.parent
+    train_path = repo_root / "data" / "train.jsonl"
+    val_path = repo_root / "data" / "val.jsonl"
+    assert train_path.exists() and train_path.stat().st_size > 0
+    assert val_path.exists() and val_path.stat().st_size > 0
+
+    train_texts = list(iter_text_files([train_path]))
+    val_texts = list(iter_text_files([val_path]))
+    assert len(train_texts) >= 100
+    assert len(val_texts) >= 10
+
+    tok = ScientificTokenizer()
+    ds = PackedTokenStreamingDataset(
+        text_stream_factory=lambda: iter_text_files([train_path]),
+        tokenizer=tok,
+        seq_len=64,
+        max_tokens=64 * 4,
+    )
+    chunks = list(ds)
+    assert len(chunks) == 4
+    assert all(c.shape == (64,) and c.dtype == torch.long for c in chunks)
